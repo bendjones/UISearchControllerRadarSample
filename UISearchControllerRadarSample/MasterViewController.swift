@@ -46,7 +46,8 @@ class MasterViewController: UITableViewController {
         self.navigationItem.rightBarButtonItem = addButton
         if let split = self.splitViewController {
             let controllers = split.viewControllers
-            self.detailViewController = controllers[controllers.count-1].topViewController as? DetailViewController
+
+            self.detailViewController = (controllers.last as? UINavigationController)?.topViewController as? DetailViewController
         }
     }
     
@@ -73,7 +74,7 @@ class MasterViewController: UITableViewController {
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
-            if let indexPath = self.tableView.indexPathForSelectedRow() {
+            if let indexPath = self.tableView.indexPathForSelectedRow {
                 let object = objects[indexPath.row] as! NSDate
                 let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
@@ -85,7 +86,8 @@ class MasterViewController: UITableViewController {
 
 }
 
-extension MasterViewController : UITableViewDataSource {
+private typealias TableViewDataSource = MasterViewController
+extension TableViewDataSource {
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
@@ -99,7 +101,7 @@ extension MasterViewController : UITableViewDataSource {
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
         
         if let searchController = searchController where searchController.active {
             let object = filteredObjects[indexPath.row] as! NSDate
@@ -132,7 +134,8 @@ extension MasterViewController : UITableViewDataSource {
     }
 }
 
-extension MasterViewController : UITableViewDelegate {
+private typealias TableViewDelegate = MasterViewController
+extension TableViewDelegate {
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let exampleView = UIView()
         exampleView.backgroundColor = UIColor.purpleColor()
@@ -144,7 +147,6 @@ extension MasterViewController : UITableViewDelegate {
         return 317
     }
 }
-
 
 extension MasterViewController : UISearchResultsUpdating {
     func updateSearchResultsForSearchController(searchController: UISearchController) {
